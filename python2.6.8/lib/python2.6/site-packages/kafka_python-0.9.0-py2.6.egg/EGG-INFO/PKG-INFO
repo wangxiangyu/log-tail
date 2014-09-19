@@ -1,0 +1,15 @@
+Metadata-Version: 1.0
+Name: kafka-python
+Version: 0.9.0
+Summary: Pure Python client for Apache Kafka
+Home-page: https://github.com/mumrah/kafka-python
+Author: David Arthur
+Author-email: mumrah@gmail.com
+License: Copyright 2012, David Arthur under Apache License, v2.0
+Description: 
+        This module provides low-level protocol support for Apache Kafka as well as
+        high-level consumer and producer classes. Request batching is supported by the
+        protocol as well as broker-aware request routing. Gzip and Snappy compression
+        is also supported for message sets.
+        
+Platform: UNKNOWN
