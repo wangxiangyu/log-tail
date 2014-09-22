@@ -45,8 +45,8 @@ class Main(object):
 
     #tags
         self.tags = {}
-        for key in self._conf_info["[JPAAS_ENV]"]:
-            self.tags[key]=self._conf_info["[JPAAS_ENV]"][key]
+        for key in self._conf_info["[TAGS]"]:
+            self.tags[key]=self._conf_info["[TAGS]"][key]
 
     def init_data_file(self):
         if not os.path.isdir("./../data"):
