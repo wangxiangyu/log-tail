@@ -37,8 +37,16 @@ class PygtailMtime(object):
         self._offset_file_inode = 0
         self._offset = 0
         self._fh = None
+
+        filelist=self._get_filelist_sortby_mtime()
+        # if filelist is null, just wait the generation of log file
+        while len(filelist)==0:
+            time.sleep(1)
+            filelist=self._get_filelist_sortby_mtime()
+
         self._rotated_logfile = None
         self.filename=self._determine_filename()
+        
 
         # if offset file exists and non-empty, open and parse it
         if exists(self._offset_file) and getsize(self._offset_file):
@@ -142,6 +150,7 @@ class PygtailMtime(object):
         fh = open(self._offset_file, "w")
         fh.write("%s\n%s\n" % (inode, offset))
         fh.close()
+
     def _determine_filename(self):
         """
         Return the second newest filename

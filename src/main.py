@@ -54,7 +54,7 @@ class Main(object):
 
     def gen_message_final_str(self,message):
         message_final={}
-        message_final["message"]=message
+        message_final["message"]=message.strip('\n')
         message_final["timestamp"]=time.time()
         message_final["tags"]=self.tags
         message_final_str=json.dumps(message_final)
