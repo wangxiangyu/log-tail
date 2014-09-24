@@ -1,3 +1,5 @@
+#!/bin/bash
+
 path=$(cd `dirname $0`; pwd)
 export PATH="$path/../python2.6.8/bin:$PATH"
 echo "[Info] PYTHON : $(which python)"
