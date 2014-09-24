@@ -29,6 +29,7 @@ class Main(object):
         self._file_path = self._conf_info["[LOG_FILE_CONF]"]["file_path"]
         self._file_name_pattern = self._conf_info["[LOG_FILE_CONF]"]["file_name_pattern"]
         self._log_max_length = int(self._conf_info["[LOG_FILE_CONF]"]["log_max_length"])
+        self._batch_flush_counter = int(self._conf_info["[LOG_FILE_CONF]"]["batch_flush_counter"])
         self._topic_name = self._conf_info["[KAFKA]"]["topic_name"]
         self._interval_time = self._conf_info["[TIME_INTERVAL]"]["interval"]
 
@@ -52,28 +53,36 @@ class Main(object):
         if not os.path.isdir("./../data"):
             os.mkdir("./../data")
 
-    def gen_message_final_str(self,message):
+    def gen_message_final_str(self,message_array=[]):
         message_final={}
-        message_final["message"]=message.strip('\n')
-        message_final["timestamp"]=time.time()
+        message_final["message"]=message_array
         message_final["tags"]=self.tags
+        message_final["tags"]["event_time"]=int(time.time()*1000)
         message_final_str=json.dumps(message_final)
         return message_final_str
 
     def event_func_mtime(self):
-        pygtail = PygtailMtime(self._file_path, self._file_name_pattern, offset_file=None, paranoid=True, copytruncate=True)
-        for line in pygtail:
-            message_final_str=self.gen_message_final_str(line)
-            message_lenth = len(message_final_str)
-            if message_lenth > self._log_max_length:
-                comlog.warning("The message is too long:" + str(message_lenth))
-                continue
-            try:
+        try:
+            pygtail = PygtailMtime(self._file_path, self._file_name_pattern, offset_file=None, paranoid=True, copytruncate=True)
+            message_array_to_send=[]
+            for line in pygtail:
+                message_lenth=len(line)
+                if message_lenth > self._log_max_length:
+                    comlog.warning("The message is too long:" + str(message_lenth))
+                    continue
+                message_array_to_send.append(line.strip('\n'))         
+                if len(message_array_to_send)>self._batch_flush_counter:
+                    message_final_str=self.gen_message_final_str(message_array_to_send)
+                    self.producer.send_messages(self._topic_name, message_final_str)
+                    message_array_to_send=[]
+            if len(message_array_to_send)>0:
+                message_final_str=self.gen_message_final_str(message_array_to_send)
                 self.producer.send_messages(self._topic_name, message_final_str)
-            except Exception,data:
-                comlog.fatal(str(Exception))
-                comlog.fatal(str(data))
-                sys.exit()
+                message_array_to_send=[]
+        except Exception,data:
+            comlog.fatal(str(Exception))
+            comlog.fatal(str(data))
+            sys.exit()
 
     def get_broker_list(self,zookeeper):
         try:

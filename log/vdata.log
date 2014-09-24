@@ -1,0 +1,2 @@
+[FATAL    09-24 11:35:32] [] [main.py:82:event_func_mtime] <type 'exceptions.Exception'>
+[FATAL    09-24 11:35:32] [] [main.py:83:event_func_mtime] global name 'message_lenth' is not defined
