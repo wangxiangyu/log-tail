@@ -71,7 +71,7 @@ class Main(object):
                     comlog.warning("The message is too long:" + str(message_lenth))
                     continue
                 message_array_to_send.append(line.strip('\n'))         
-                if len(message_array_to_send)>self._batch_flush_counter:
+                if len(message_array_to_send)>int(self._batch_flush_counter):
                     message_final_str=self.gen_message_final_str(message_array_to_send)
                     self.producer.send_messages(self._topic_name, message_final_str)
                     message_array_to_send=[]
